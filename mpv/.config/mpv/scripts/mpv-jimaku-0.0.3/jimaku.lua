@@ -2,7 +2,7 @@ local utils = require "mp.utils"
 local mpi = require "mp.input"
 
 -- API Key (Replace with your actual Jimaku API Key)
-local API_KEY = "AAAAAAAABJQuAS7SdfYhXD0sxWeUibbFANqn9FcJOFpk2WA6lqtGjR0-cQ"
+local API_KEY = "YOUR_API_KEY_GOES_HERE"
 
 -- Config options
 local PROMPT_EPISODE = true

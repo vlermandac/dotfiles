@@ -1,7 +1,7 @@
 // Go to https://jimaku.cc/login and create a new account.
 // Then go to https://jimaku.cc/account and click the `Generate` button to create a new API key
 // Click the `Copy` button and paste it below
-var API_KEY = 'AAAAAAAABJQuAS7SdfYhXD0sxWeUibbFANqn9FcJOFpk2WA6lqtGjR0-cQ';
+var API_KEY = 'YOUR_API_KEY_GOES_HERE';
 
 // Filter the response to only have the specified episode
 var PROMPT_EPISODE = true;

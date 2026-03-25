@@ -3,7 +3,7 @@ local mpi = require "mp.input"  -- load the mp.input module
 local msg = require "mp.msg"    -- load the mp.msg module for logging
 
 -- API Key (Replace with your actual Jimaku API Key)
-local API_KEY = "AAAAAAAABJQuAS7SdfYhXD0sxWeUibbFANqn9FcJOFpk2WA6lqtGjR0-cQ"
+local API_KEY = "YOUR_API_KEY_GOES_HERE"
 
 -- Config options
 local PROMPT_EPISODE = true
@@ -296,4 +296,3 @@ end
 -- Key binding
 --------------------------------------------------------------------------------
 mp.add_key_binding(MANUAL_SEARCH_KEY, "jimaku-manual-search", function() search() end)
-
