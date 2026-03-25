@@ -21,7 +21,10 @@ discover_packages() {
   printf '%s\n' "${found[@]}"
 }
 
-mapfile -t packages < <(discover_packages)
+packages=()
+while IFS= read -r package; do
+  [[ -n "${package}" ]] && packages+=("${package}")
+done < <(discover_packages)
 
 if [[ "${#packages[@]}" -eq 0 ]]; then
   echo "No packages found in ${repo_dir}." >&2
