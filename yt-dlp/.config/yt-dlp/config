@@ -1,0 +1,8 @@
+# Use best available format
+f bestvideo+bestaudio/best
+
+# Extract cookies from Brave
+--cookies-from-browser=brave
+
+# Save files in your Downloads folder
+-o ~/Downloads/%(title)s [%(id)s].%(ext)s
