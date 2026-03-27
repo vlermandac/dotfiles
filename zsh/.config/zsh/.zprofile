@@ -12,7 +12,6 @@ fi
 
 # default programs
 export EDITOR="nvim"
-export TERM="kitty"
 export TERMINAL="kitty"
 export MUSPLAYER=""
 export BROWSER="brave"
