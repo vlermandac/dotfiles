@@ -1,4 +1,4 @@
-# ~/.config/zsh/rc.d/00-options.zsh
+# ~/.config/zsh/zshrc.d/00-options.zsh
 
 # History
 HISTSIZE=1000000
