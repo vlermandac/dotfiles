@@ -1,0 +1,44 @@
+onboarding = false
+
+[worktrees]
+directory = "~/Workspace/Work/herdr-worktrees"
+
+# Follow the host terminal palette. Kitty receives live colors from Matugen.
+# Named ANSI colors stay dynamic; RGB overrides would freeze this palette.
+[theme]
+name = "terminal"
+auto_switch = false
+
+[theme.custom]
+# Matugen's normal blue/cyan slots are dark containers; their bright slots
+# carry the readable primary/tertiary accents on this dark desktop palette.
+accent = "lightblue"
+blue = "lightblue"
+teal = "lightcyan"
+mauve = "lightmagenta"
+
+[terminal]
+default_shell = "/bin/zsh"
+shell_mode = "auto"
+new_cwd = "follow"
+
+[ui]
+agent_panel_sort = "spaces"
+
+[keys]
+# h/l move between tabs, j/k between spaces. One pane per tab here, so the
+# default pane-movement bindings on these keys are freed below.
+previous_tab       = "prefix+h"
+next_tab           = "prefix+l"
+next_workspace     = "prefix+j"
+previous_workspace = "prefix+k"
+
+# Unbound: reclaimed for the tab/space movement above.
+focus_pane_left  = ""
+focus_pane_down  = ""
+focus_pane_up    = ""
+focus_pane_right = ""
+
+# Scrollback. herdr does not recognise pageup/pagedown as bindable keys, so
+# scrolling goes through copy mode, exactly as in tmux.
+copy_mode = "prefix+["

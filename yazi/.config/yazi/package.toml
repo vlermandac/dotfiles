@@ -1,0 +1,17 @@
+[[plugin.deps]]
+use = "boydaihungst/gvfs"
+rev = "3abc0a2"
+hash = "eed89e75671723c8f9390a2862af0e4e"
+
+[[plugin.deps]]
+use = "pakhromov/localsend"
+rev = "900aa77"
+hash = "25f91b7dc5282ed65a94e1be02ee6265"
+
+[[plugin.deps]]
+use = "pirafrank/what-size"
+rev = "179ebf6"
+hash = "57056b9728006881d580ccabe8154a9c"
+
+[flavor]
+deps = []

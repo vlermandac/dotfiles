@@ -2,3 +2,8 @@
 (^|/)\.github(/|$)
 (^|/)\.gitignore$
 (^|/)\.DS_Store$
+(^|/)hosts\.yml$
+(^|/)env\.local\.zsh$
+\.bak(-.*)?$
+\.before-.*$
+\.(tmp|orig)$

@@ -21,6 +21,27 @@ bindkey -M viins '^H' backward-delete-char
 # Optional: quick escape from insert mode
 bindkey -M viins 'jk' vi-cmd-mode
 
+function _copy_zle_cutbuffer_to_clipboard {
+  if [[ -n $CUTBUFFER ]] && command -v wl-copy >/dev/null 2>&1; then
+    printf '%s' "${CUTBUFFER%$'\n'}" | wl-copy
+  fi
+}
+
+function vi-yank-clipboard {
+  zle .vi-yank
+  _copy_zle_cutbuffer_to_clipboard
+}
+zle -N vi-yank-clipboard
+
+function vi-yank-whole-line-clipboard {
+  zle .vi-yank-whole-line
+  _copy_zle_cutbuffer_to_clipboard
+}
+zle -N vi-yank-whole-line-clipboard
+
+bindkey -M vicmd 'y' vi-yank-clipboard
+bindkey -M vicmd 'Y' vi-yank-whole-line-clipboard
+
 function zle-keymap-select {
   if [[ $KEYMAP == vicmd ]]; then
     echo -ne '\e[1 q'  # block cursor

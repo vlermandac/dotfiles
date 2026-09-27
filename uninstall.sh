@@ -8,17 +8,13 @@ fi
 
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 target_dir="${HOME}"
+packages=(btop environment gh git herdr kitty mpv npm nvim paru sioyek thunar tree-sitter yazi yt-dlp zsh)
+stow_ignore='^([.]zprofile|[.]zshenv|[.]zshrc|zshrc[.]d)(/|$)|(^|/)(hosts[.]yml|env[.]local[.]zsh)$|[.](bak(-.*)?|before-.*|tmp|orig)$'
 
-packages=()
-for dir in "${repo_dir}"/*; do
-  [[ -d "${dir}" ]] || continue
-  packages+=("$(basename "${dir}")")
-done
-
-if [[ "${#packages[@]}" -eq 0 ]]; then
-  echo "No packages found in ${repo_dir}." >&2
-  exit 1
-fi
-
-stow --dir "${repo_dir}" --target "${target_dir}" --delete "${packages[@]}"
+stow \
+  --no-folding \
+  --ignore "${stow_ignore}" \
+  --dir "${repo_dir}" \
+  --target "${target_dir}" \
+  --delete "${packages[@]}"
 echo "Dotfiles unstowed from ${target_dir}."

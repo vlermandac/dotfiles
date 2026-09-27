@@ -1,0 +1,148 @@
+{
+  "LaTeX document": {
+    "prefix": "doc",
+    "body": [
+      "\\documentclass{article}",
+      "",
+      "\\usepackage{fontspec}",
+      "\\usepackage{amsmath}",
+      "\\usepackage{graphicx}",
+      "\\usepackage{booktabs}",
+      "\\usepackage{hyperref}",
+      "\\usepackage{cleveref}",
+      "",
+      "\\title{${1:Title}}",
+      "\\author{${2:Author}}",
+      "\\date{${3:\\today}}",
+      "",
+      "\\begin{document}",
+      "",
+      "\\maketitle",
+      "",
+      "$0",
+      "",
+      "\\end{document}"
+    ],
+    "description": "Basic LuaLaTeX article"
+  },
+  "Begin environment": {
+    "prefix": "beg",
+    "body": [
+      "\\begin{${1:environment}}",
+      "  $0",
+      "\\end{${1:environment}}"
+    ],
+    "description": "Begin and end an environment"
+  },
+  "Section": {
+    "prefix": "sec",
+    "body": [
+      "\\section{${1:Title}}",
+      "",
+      "$0"
+    ],
+    "description": "Section"
+  },
+  "Subsection": {
+    "prefix": "subsec",
+    "body": [
+      "\\subsection{${1:Title}}",
+      "",
+      "$0"
+    ],
+    "description": "Subsection"
+  },
+  "Subsubsection": {
+    "prefix": "subsub",
+    "body": [
+      "\\subsubsection{${1:Title}}",
+      "",
+      "$0"
+    ],
+    "description": "Subsubsection"
+  },
+  "Figure": {
+    "prefix": "fig",
+    "body": [
+      "\\begin{figure}[htbp]",
+      "  \\centering",
+      "  \\includegraphics[width=${1:0.8\\textwidth}]{${2:path}}",
+      "  \\caption{${3:Caption}}",
+      "  \\label{fig:${4:label}}",
+      "\\end{figure}",
+      "$0"
+    ],
+    "description": "Figure environment"
+  },
+  "Table": {
+    "prefix": "tab",
+    "body": [
+      "\\begin{table}[htbp]",
+      "  \\centering",
+      "  \\begin{tabular}{${1:cc}}",
+      "    \\toprule",
+      "    ${2:Header 1} & ${3:Header 2} \\\\",
+      "    \\midrule",
+      "    ${4:Value 1} & ${5:Value 2} \\\\",
+      "    \\bottomrule",
+      "  \\end{tabular}",
+      "  \\caption{${6:Caption}}",
+      "  \\label{tab:${7:label}}",
+      "\\end{table}",
+      "$0"
+    ],
+    "description": "Table environment"
+  },
+  "Align": {
+    "prefix": "align",
+    "body": [
+      "\\begin{align}",
+      "  ${1:equation} &= ${2:value}",
+      "\\end{align}",
+      "$0"
+    ],
+    "description": "Align environment"
+  },
+  "Citation": {
+    "prefix": "cite",
+    "body": "\\cite{${1:key}}$0",
+    "description": "Citation"
+  },
+  "Reference": {
+    "prefix": "ref",
+    "body": "\\ref{${1:label}}$0",
+    "description": "Reference"
+  },
+  "Clever reference": {
+    "prefix": "cref",
+    "body": "\\cref{${1:label}}$0",
+    "description": "Cleveref reference"
+  },
+  "Item": {
+    "prefix": "item",
+    "body": "\\item ${1:text}$0",
+    "description": "List item"
+  },
+  "Enumerate": {
+    "prefix": "enum",
+    "body": [
+      "\\begin{enumerate}",
+      "  \\item ${1:First item}",
+      "\\end{enumerate}",
+      "$0"
+    ],
+    "description": "Enumerate environment"
+  },
+  "Bibliography": {
+    "prefix": "bib",
+    "body": [
+      "\\usepackage[backend=biber,style=${1:authoryear}]{biblatex}",
+      "\\addbibresource{${2:references.bib}}",
+      "",
+      "$0",
+      "",
+      "\\printbibliography"
+    ],
+    "description": "Biblatex setup and print bibliography"
+  }
+}

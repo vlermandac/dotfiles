@@ -1,0 +1,31 @@
+[opener]
+imv = [
+  { run = 'imv-wayland %s', orphan = true, desc = "View image", for = "unix" },
+]
+sioyek = [
+  { run = '/home/vlermanda/.local/bin/yazi-open-pdf %S1', orphan = true, for = "unix" },
+]
+mpv = [
+  { run = '/bin/mpv --force-window=yes %s1', orphan = true, for = "unix" },
+]
+
+[open]
+prepend_rules = [
+  { mime = "image/*", use = "imv" },
+  { url = "*.{jpg,jpeg,jpe,png,webp,gif,svg,bmp,tif,tiff,heic,heif,avif,jxl,qoi,ff}", use = "imv" },
+  { url = "*.pdf", use = "sioyek" },
+  { mime = "application/pdf", use = "sioyek" },
+  { mime = "audio/*", use = "mpv" },
+  { mime = "video/*", use = "mpv" },
+]
+
+[plugin]
+prepend_preloaders = [
+  { url = "/run/user/1000/gvfs/**/*", run = "noop" },
+  { url = "/run/media/vlermanda/**/*", run = "noop" },
+]
+prepend_previewers = [
+  { url = "*/", run = "folder" },
+  { url = "/run/user/1000/gvfs/**/*", run = "noop" },
+  { url = "/run/media/vlermanda/**/*", run = "noop" },
+]

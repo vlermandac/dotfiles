@@ -21,12 +21,13 @@ return {
       },
       dashboard = {
         sections = {
-          {
-            section = "terminal",
-            cmd = "chafa ~/Downloads/witch.png --format kitty --size 60x17 --stretch; sleep .1",
+          require("config.snacks-dashboard-image").section({
+            path = vim.env.SNACKS_DASHBOARD_IMAGE or "~/Common/Pictures/bocchi.jpg",
+            width = 60,
             height = 17,
+            align = "center",
             padding = 1,
-          },
+          }),
           {
             { section = "keys", gap = 1, padding = 1 },
             { section = "startup" },

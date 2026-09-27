@@ -6,7 +6,19 @@
 *.swo
 *.tmp
 *.bak
+*.bak-*
+*.before-*
 *.orig
 
 # local agent metadata
 .agent/
+
+# Machine-local credentials/account state are never versioned.
+gh/.config/gh/hosts.yml
+zsh/.config/zsh/zshrc.d/env.local.zsh
+
+# Dynamic palettes belong to the external theme generator.
+kitty/.config/kitty/current-theme.conf
+yazi/.config/yazi/theme.toml
+btop/.config/btop/themes/matugen.theme
+sioyek/.config/sioyek/prefs_user.config

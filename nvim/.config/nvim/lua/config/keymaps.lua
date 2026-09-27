@@ -4,3 +4,15 @@
 
 -- Keep Vim's default `s` only in Visual mode
 pcall(vim.keymap.del, "x", "s")
+
+pcall(vim.keymap.del, "n", "<leader>qq")
+
+vim.keymap.set("n", "<leader>q", function()
+  for _, win in ipairs(vim.fn.getwininfo()) do
+    if win.quickfix == 1 then
+      vim.cmd("cclose")
+      return
+    end
+  end
+  vim.cmd("copen")
+end, { desc = "Quickfix Toggle" })

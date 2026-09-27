@@ -14,7 +14,7 @@ fi
 export EDITOR="nvim"
 export TERMINAL="kitty"
 export MUSPLAYER=""
-export BROWSER="brave"
+export BROWSER="open-personal-link"
 export BROWSER2=""
 
 export XDG_RUNTIME_DIR="/run/user/$UID"
@@ -26,13 +26,20 @@ export PYTHON_HISTORY="$XDG_DATA_HOME/python/history"
 # moving other files and some other vars
 export WGETRC="$XDG_CONFIG_HOME/wget/wgetrc"
 export PYTHONSTARTUP="$XDG_CONFIG_HOME/python/pythonrc"
-export GNUPGHOME="$XDG_DATA_HOME/gnupg"
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
+export ELAN_HOME="$XDG_DATA_HOME/elan"
 export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
 export GOPATH="$XDG_DATA_HOME/go"
 export GOBIN="$GOPATH/bin"
 export GOMODCACHE="$XDG_CACHE_HOME/go/mod"
-export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME/npm/npmrc"
+# CUDA_CACHE_PATH is shared with GUI services through .zshenv/environment.d.
+export TRITON_CACHE_DIR="$XDG_CACHE_HOME/triton"
+export IPYTHONDIR="$XDG_CONFIG_HOME/ipython"
+export NLTK_DATA="$XDG_DATA_HOME/nltk_data"
+export TEXMFCONFIG="$XDG_CONFIG_HOME/texlive/texmf-config"
+export TEXMFVAR="$XDG_CACHE_HOME/texlive/texmf-var"
+export TEXMFHOME="$XDG_DATA_HOME/texmf"
+export PNPM_HOME="$XDG_DATA_HOME/pnpm"
 export _JAVA_OPTIONS=-Djava.util.prefs.userRoot="$XDG_CONFIG_HOME/java"
 export _JAVA_AWT_WM_NONREPARENTING=1
 export JUPYTER_CONFIG_DIR="$XDG_CONFIG_HOME"/jupyter
@@ -54,3 +61,14 @@ export LESS_TERMCAP_so="$(printf '%b' '[01;44;33m')"
 export LESS_TERMCAP_se="$(printf '%b' '[0m')"
 export LESS_TERMCAP_us="$(printf '%b' '[1;32m')"
 export LESS_TERMCAP_ue="$(printf '%b' '[0m')"
+
+
+# Load secrets from pass only if available
+if command -v pass >/dev/null 2>&1; then
+  # Example entries:
+  #   pass insert api/openai
+
+  OPENAI_API_KEY="$(pass show api/openai 2>/dev/null | head -n1)"
+
+  [[ -n "$OPENAI_API_KEY" ]] && export OPENAI_API_KEY
+fi

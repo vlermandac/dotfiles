@@ -1,8 +1,22 @@
 # Use best available format
-f bestvideo+bestaudio/best
+-f bestvideo+bestaudio/best
 
-# Extract cookies from Brave
---cookies-from-browser=brave
+# (AI-assisted) Read fresh cookies directly; never export a plaintext cookie file.
+# Hyprland auto-detection can choose basictext, but Brave uses GNOME Keyring here.
+# Default is the existing Brave profile; cookie authentication uses its signed-in account.
+# Override with --no-cookies-from-browser when authentication is unnecessary.
+--cookies-from-browser brave+gnomekeyring:Default
+--no-cookies
+
+# Upstream request-spacing preset; applies independently to each yt-dlp process.
+-t sleep
+--concurrent-fragments 1
+--retries 3
+--fragment-retries 3
+--extractor-retries 1
+--retry-sleep http:5
+--retry-sleep fragment:5
+--retry-sleep extractor:5
 
 # Save files in your Downloads folder
--o ~/Downloads/%(title)s [%(id)s].%(ext)s
+-o "~/Downloads/%(title)s [%(id)s].%(ext)s"
