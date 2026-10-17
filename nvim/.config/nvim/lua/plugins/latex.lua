@@ -3,11 +3,13 @@ return {
     "lervag/vimtex",
     lazy = false,
     init = function()
-      vim.g.vimtex_view_method = "sioyek"
+      vim.g.vimtex_view_method = "zathura_simple"
       vim.g.vimtex_view_automatic = 0
       vim.g.vimtex_callback_progpath = vim.fn.expand("~/.local/bin/nvim-vimtex-inverse")
-      vim.g.vimtex_view_sioyek_exe = vim.fn.expand("~/.local/bin/sioyek-vimtex-light")
-      vim.g.vimtex_view_sioyek_options = "--instance-name vimtex --new-window --execute-command 'turn_on_synctex'"
+      -- Flathub's current build has no SyncTeX library. Opening/reloading works;
+      -- disable unsupported source-jump flags instead of breaking PDF viewing.
+      vim.g.vimtex_view_zathura_use_synctex = 0
+      vim.g.vimtex_view_zathura_check_libsynctex = 0
       vim.g.vimtex_compiler_method = "latexmk"
       vim.g.vimtex_quickfix_mode = 0
 

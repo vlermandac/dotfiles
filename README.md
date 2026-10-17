@@ -54,8 +54,10 @@ and Zsh env.local.zsh remain local and ignored; configure credentials separately
 This is the current user's desktop configuration, not a portable distro preset:
 some files retain absolute local paths. Review them before installing elsewhere.
 Paru expects the existing `paru-security-gate` and local Sioyek package overlay;
-Yazi expects `yazi-open-pdf`, ripdrag, imv-wayland, mpv, wl-copy and ImageMagick.
+Yazi expects `pdf-open` (Zathura), ripdrag, imv-wayland, mpv, wl-copy and ImageMagick.
 Those helpers retain their current owners and are not copied here.
+PDF reading uses the user-installed `org.pwmt.zathura` Flatpak with original
+document colors. Sioyek is retired; see `docs/PDF_READER.md`.
 Install Yazi's upstream plugins from its manifest with `ya pkg install`.
 The local drag and image-clipboard plugins are retained as installed.
 Dynamic themes are supplied by the separate Matugen integration.

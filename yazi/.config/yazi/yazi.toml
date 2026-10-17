@@ -2,8 +2,8 @@
 imv = [
   { run = 'imv-wayland %s', orphan = true, desc = "View image", for = "unix" },
 ]
-sioyek = [
-  { run = '/home/vlermanda/.local/bin/yazi-open-pdf %S1', orphan = true, for = "unix" },
+pdf = [
+  { run = '"$HOME/.local/bin/pdf-open" %s', orphan = true, desc = "Read PDF", for = "unix" },
 ]
 mpv = [
   { run = '/bin/mpv --force-window=yes %s1', orphan = true, for = "unix" },
@@ -13,8 +13,8 @@ mpv = [
 prepend_rules = [
   { mime = "image/*", use = "imv" },
   { url = "*.{jpg,jpeg,jpe,png,webp,gif,svg,bmp,tif,tiff,heic,heif,avif,jxl,qoi,ff}", use = "imv" },
-  { url = "*.pdf", use = "sioyek" },
-  { mime = "application/pdf", use = "sioyek" },
+  { url = "*.{pdf,PDF}", use = "pdf" },
+  { mime = "application/pdf", use = "pdf" },
   { mime = "audio/*", use = "mpv" },
   { mime = "video/*", use = "mpv" },
 ]
