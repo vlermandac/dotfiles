@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+direction="${1:-next}"
+case "$direction" in
+  next | prev) ;;
+  *) direction="next" ;;
+esac
+
+state_file="${XDG_RUNTIME_DIR:-/tmp}/hypr-alt-tab-state.json"
+now="$(date +%s%3N)"
+ttl_ms=2000
+
+workspace="$(hyprctl activeworkspace -j | jq -r '.name // (.id | tostring)')"
+active="$(hyprctl activewindow -j | jq -r '.address // ""')"
+[[ -n "$workspace" && -n "$active" ]] || exit 0
+
+clients_json="$(hyprctl clients -j)"
+sequence_json="$(
+  jq -c --arg ws "$workspace" '
+    [
+      .[]
+      | select(.workspace.name == $ws)
+      | select(.hidden != true)
+      | select(.address != null and .address != "")
+    ]
+    | sort_by(.focusHistoryID)
+    | map(.address)
+  ' <<<"$clients_json"
+)"
+
+count="$(jq 'length' <<<"$sequence_json")"
+(( count > 1 )) || exit 0
+
+use_previous_state=false
+if [[ -f "$state_file" ]]; then
+  state_workspace="$(jq -r '.workspace // ""' "$state_file" 2>/dev/null || true)"
+  state_ts="$(jq -r '.ts // 0' "$state_file" 2>/dev/null || true)"
+  if [[ "$state_workspace" == "$workspace" && "$state_ts" =~ ^[0-9]+$ && $((now - state_ts)) -le $ttl_ms ]]; then
+    if jq -e --arg active "$active" '.sequence | index($active) != null' "$state_file" >/dev/null 2>&1; then
+      sequence_json="$(jq -c '.sequence' "$state_file")"
+      count="$(jq 'length' <<<"$sequence_json")"
+      use_previous_state=true
+    fi
+  fi
+fi
+
+current_index="$(
+  jq -r --arg active "$active" '
+    . as $items
+    | reduce range(0; length) as $i (null; if $items[$i] == $active then $i else . end)
+    | if . == null then 0 else . end
+  ' <<<"$sequence_json"
+)"
+
+if [[ "$use_previous_state" == false ]]; then
+  current_index=0
+fi
+
+if [[ "$direction" == "next" ]]; then
+  target_index=$(((current_index + 1) % count))
+else
+  target_index=$(((current_index + count - 1) % count))
+fi
+
+target="$(jq -r --argjson i "$target_index" '.[$i]' <<<"$sequence_json")"
+[[ -n "$target" && "$target" != "null" ]] || exit 0
+
+hyprctl dispatch "hl.dsp.focus({ window = \"address:$target\" })" >/dev/null
+hyprctl dispatch 'require("hypr.settings").move_cursor_to_active_window()' >/dev/null 2>&1 || true
+
+jq -nc \
+  --arg workspace "$workspace" \
+  --argjson ts "$now" \
+  --argjson sequence "$sequence_json" \
+  '{workspace: $workspace, ts: $ts, sequence: $sequence}' >"$state_file"

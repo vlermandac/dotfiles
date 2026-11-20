@@ -9,7 +9,7 @@ fi
 
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 target_dir="${HOME}"
-packages=(btop environment gh git herdr kitty mpv npm nvim paru sioyek thunar tree-sitter yazi yt-dlp zsh)
+packages=(btop environment gh git herdr hypr kitty mpv npm nvim paru sioyek thunar tree-sitter yazi yt-dlp zsh)
 
 # ZDOTDIR is set by /etc/zsh/zshenv, so only ~/.config/zsh is needed.
 # Ignoring these package-root compatibility links keeps $HOME symlink-free.

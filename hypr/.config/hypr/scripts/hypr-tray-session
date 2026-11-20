@@ -1,0 +1,200 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tray_name="tray"
+tray_workspace="special:${tray_name}"
+tray_monitor="DP-3"
+mode="${1:-ensure}"
+state_dir="${XDG_STATE_HOME:-${HOME}/.local/state}/hypr"
+log_file="${state_dir}/tray-session.log"
+lock_file="${XDG_RUNTIME_DIR:-/tmp}/hypr-tray-session.lock"
+
+mkdir -p "$state_dir"
+exec 9>"$lock_file"
+flock -n 9 || exit 0
+
+if [ "$mode" != "status" ]; then
+  exec >>"$log_file" 2>&1
+fi
+
+if [ "$mode" != "status" ]; then
+  printf '\n[%s] tray session: %s\n' "$(date --iso-8601=seconds)" "$mode"
+fi
+
+dispatch() {
+  hyprctl dispatch "$1" >/dev/null
+}
+
+focus_monitor() {
+  dispatch "hl.dsp.focus({ monitor = \"$1\" })"
+}
+
+focus_workspace() {
+  dispatch "hl.dsp.focus({ workspace = \"$1\" })"
+}
+
+focus_window() {
+  dispatch "hl.dsp.focus({ window = \"address:$1\" })"
+}
+
+move_window() {
+  dispatch "hl.dsp.window.move({ workspace = \"$tray_workspace\", window = \"address:$1\", follow = false })"
+}
+
+toggle_tray() {
+  dispatch "hl.dsp.workspace.toggle_special(\"$tray_name\")"
+}
+
+preselect() {
+  dispatch "hl.dsp.layout(\"preselect $1\")"
+}
+
+set_split_ratio() {
+  dispatch "hl.dsp.layout(\"splitratio $1 exact\")"
+}
+
+clients() {
+  hyprctl clients -j
+}
+
+find_thunderbird() {
+  jq -r '
+    .[]
+    | select(.class == "org.mozilla.Thunderbird" or .class == "thunderbird-beta")
+    | select(.initialTitle == "Mozilla Thunderbird" or .initialTitle == "Mozilla Thunderbird Beta")
+    | .address
+  ' <<<"$1" | head -n1
+}
+
+find_telegram() {
+  jq -r '
+    .[]
+    | select(.class == "org.telegram.desktop")
+    | select(.initialTitle == "Telegram")
+    | .address
+  ' <<<"$1" | head -n1
+}
+
+window_workspace() {
+  local address="$1"
+  jq -r --arg address "$address" '.[] | select(.address == $address) | .workspace.name' <<<"$2"
+}
+
+wait_for() {
+  local finder="$1"
+  local snapshot address
+
+  for _ in $(seq 1 100); do
+    snapshot="$(clients)"
+    address="$($finder "$snapshot")"
+    if [ -n "$address" ]; then
+      printf '%s\n' "$address"
+      return 0
+    fi
+    sleep 0.1
+  done
+
+  return 1
+}
+
+ensure_thunderbird() {
+  local snapshot address
+  snapshot="$(clients)"
+  address="$(find_thunderbird "$snapshot")"
+  if [ -z "$address" ]; then
+    thunderbird -mail >/dev/null 2>&1 &
+    address="$(wait_for find_thunderbird)" || return 1
+  fi
+  printf '%s\n' "$address"
+}
+
+ensure_telegram() {
+  local snapshot address
+  snapshot="$(clients)"
+  address="$(find_telegram "$snapshot")"
+  if [ -z "$address" ]; then
+    /usr/bin/Telegram -- >/dev/null 2>&1 &
+    address="$(wait_for find_telegram)" || return 1
+  fi
+  printf '%s\n' "$address"
+}
+
+all_ready() {
+  local snapshot thunderbird telegram
+  snapshot="$(clients)"
+  thunderbird="$(find_thunderbird "$snapshot")"
+  telegram="$(find_telegram "$snapshot")"
+  [ -n "$thunderbird" ] && [ -n "$telegram" ] &&
+    [ "$(window_workspace "$thunderbird" "$snapshot")" = "$tray_workspace" ] &&
+    [ "$(window_workspace "$telegram" "$snapshot")" = "$tray_workspace" ]
+}
+
+build_layout() {
+  local original_monitor original_workspace original_window monitor_state tray_was_visible
+  local thunderbird telegram
+
+  original_monitor="$(hyprctl activeworkspace -j | jq -r '.monitor')"
+  original_workspace="$(hyprctl activeworkspace -j | jq -r '.name')"
+  original_window="$(hyprctl activewindow -j | jq -r '.address // empty')"
+
+  monitor_state="$(hyprctl monitors -j)"
+  tray_was_visible="$(
+    jq -r --arg monitor "$tray_monitor" --arg tray "$tray_workspace" '
+      any(.[]; .name == $monitor and .specialWorkspace.name == $tray)
+    ' <<<"$monitor_state"
+  )"
+
+  focus_monitor "$tray_monitor"
+  if [ "$tray_was_visible" != "true" ]; then
+    toggle_tray
+    sleep 0.15
+  fi
+
+  thunderbird="$(ensure_thunderbird)"
+  if [ "$(window_workspace "$thunderbird" "$(clients)")" != "$tray_workspace" ]; then
+    move_window "$thunderbird"
+  fi
+  focus_window "$thunderbird"
+  preselect d
+
+  telegram="$(ensure_telegram)"
+  if [ "$(window_workspace "$telegram" "$(clients)")" != "$tray_workspace" ]; then
+    move_window "$telegram"
+  fi
+
+  # Keep the two remaining tray applications evenly split.
+  focus_window "$thunderbird"
+  set_split_ratio 1.0
+
+  if [ "$tray_was_visible" != "true" ]; then
+    toggle_tray
+  fi
+
+  focus_monitor "$original_monitor"
+  focus_workspace "$original_workspace"
+  if [ -n "$original_window" ]; then
+    focus_window "$original_window" || true
+  fi
+}
+
+case "$mode" in
+  ensure)
+    if ! all_ready; then
+      build_layout
+    fi
+    ;;
+  migrate)
+    build_layout
+    ;;
+  status)
+    clients | jq --arg tray "$tray_workspace" '[
+      .[]
+      | select(.workspace.name == $tray)
+      | {class, initialClass, title, initialTitle, floating, at, size}
+    ]'
+    ;;
+  *)
+    printf 'Usage: %s [ensure|migrate|status]\n' "$0" >&2
+    exit 2
+    ;;
+esac

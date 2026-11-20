@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+focused="$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .name')"
+
+if [ "$focused" = "HDMI-A-1" ]; then
+    hyprctl dispatch movefocus d
+else
+    hyprctl dispatch workspace m+1
+fi

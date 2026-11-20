@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tray_monitor="${HYPR_TRAY_MONITOR:-DP-3}"
+tray_name="${HYPR_TRAY_NAME:-tray}"
+tray_workspace="special:${tray_name}"
+state_file="${XDG_RUNTIME_DIR:-/tmp}/hypr-special-tray-state.json"
+
+lua_escape() {
+  printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+}
+
+dispatch_focus_workspace() {
+  local workspace="$1"
+  local escaped
+  escaped="$(lua_escape "$workspace")"
+  hyprctl dispatch "hl.dsp.focus({ workspace = \"${escaped}\" })" >/dev/null
+}
+
+dispatch_focus_monitor() {
+  local monitor="$1"
+  local escaped
+  escaped="$(lua_escape "$monitor")"
+  hyprctl dispatch "hl.dsp.focus({ monitor = \"${escaped}\" })" >/dev/null
+}
+
+dispatch_toggle_tray() {
+  local escaped
+  escaped="$(lua_escape "$tray_name")"
+  hyprctl dispatch "hl.dsp.workspace.toggle_special(\"${escaped}\")" >/dev/null
+}
+
+monitor_state="$(hyprctl monitors -j)"
+tray_visible="$(
+  jq -r --arg monitor "$tray_monitor" --arg tray "$tray_workspace" '
+    .[]
+    | select(.name == $monitor)
+    | .specialWorkspace.name == $tray
+  ' <<<"$monitor_state"
+)"
+
+if [[ "$tray_visible" == "true" ]]; then
+  dispatch_focus_monitor "$tray_monitor"
+  dispatch_toggle_tray
+
+  if [[ -f "$state_file" ]]; then
+    restore_workspace="$(jq -r '.workspace // empty' "$state_file" 2>/dev/null || true)"
+    if [[ -n "$restore_workspace" ]]; then
+      dispatch_focus_workspace "$restore_workspace" || true
+    fi
+  fi
+  exit 0
+fi
+
+active_workspace="$(
+  jq -r '
+    .[]
+    | select(.focused == true)
+    | .activeWorkspace.name // empty
+  ' <<<"$monitor_state"
+)"
+
+if [[ -z "$active_workspace" ]]; then
+  active_workspace="$(hyprctl activeworkspace -j | jq -r '.name // (.id | tostring)')"
+fi
+
+jq -nc \
+  --arg workspace "$active_workspace" \
+  --arg monitor "$(hyprctl activeworkspace -j | jq -r '.monitor // empty')" \
+  --arg tray_monitor "$tray_monitor" \
+  '{workspace: $workspace, monitor: $monitor, tray_monitor: $tray_monitor}' >"$state_file"
+
+dispatch_focus_monitor "$tray_monitor"
+dispatch_toggle_tray
