@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# (AI-assisted) Herdr can be pulled in before Hyprland creates and imports its Wayland
+# environment. Restart it once at session start so later terminals inherit the live socket.
+# Run by unified-session-herdr.service, after the session environment is imported.
+set -euo pipefail
+
+systemctl --user is-active --quiet herdr-server.service || exit 0
+pid="$(systemctl --user show herdr-server.service --property MainPID --value)"
+[[ -n "$pid" && "$pid" != 0 && -r "/proc/$pid/environ" ]] || exit 0
+live="$(systemctl --user show-environment | sed -n 's/^WAYLAND_DISPLAY=//p')"
+inherited="$(tr '\0' '\n' < "/proc/$pid/environ" | sed -n 's/^WAYLAND_DISPLAY=//p' | head -n1)"
+if [[ -n "$live" && "$inherited" != "$live" ]]; then
+    systemctl --user restart herdr-server.service
+fi

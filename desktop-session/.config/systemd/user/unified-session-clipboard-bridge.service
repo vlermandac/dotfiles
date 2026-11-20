@@ -1,0 +1,15 @@
+# (AI-assisted) clipboard-bridge is WantedBy default.target and fails until Wayland exists.
+# Restart it once the session environment is imported.
+[Unit]
+Description=Start the clipboard bridge in the live session
+After=unified-session-environment.service
+PartOf=unified-session.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=-/usr/bin/systemctl --user reset-failed clipboard-bridge.service
+ExecStart=/usr/bin/systemctl --user start --no-block clipboard-bridge.service
+
+[Install]
+WantedBy=unified-session.target

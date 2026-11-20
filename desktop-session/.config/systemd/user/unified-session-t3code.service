@@ -1,0 +1,14 @@
+# (AI-assisted) T3 Code desktop client at login. Opening it also updates the T3 server after a system update.
+# Ordered after the tray layout so its window never lands in the hidden tray. Not PartOf the
+# session: restarting the session must not close a running client.
+[Unit]
+Description=T3 Code desktop client (session autostart)
+After=unified-session-tray.service unified-quickshell.service
+
+[Service]
+Type=exec
+ExecCondition=/bin/sh -c '! pgrep -x t3code >/dev/null'
+ExecStart=/opt/t3code-nightly-bin/t3code
+
+[Install]
+WantedBy=unified-session.target

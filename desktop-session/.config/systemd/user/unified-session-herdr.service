@@ -1,0 +1,14 @@
+# (AI-assisted) Restart a Herdr server that was started before Wayland existed, once per
+# session, so terminals it creates inherit the live display. Part of unified-session.target.
+[Unit]
+Description=Give Herdr the live Wayland session
+After=unified-session-environment.service
+PartOf=unified-session.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=%h/.config/hypr/scripts/session-herdr-refresh
+
+[Install]
+WantedBy=unified-session.target

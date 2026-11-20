@@ -1,0 +1,17 @@
+# (AI-assisted) Arrange Thunderbird and Telegram in the hidden special:tray workspace. The tray is
+# shown while this runs, so any other window that maps meanwhile lands in it. Units that open
+# windows at login order themselves After= this one.
+[Unit]
+Description=Arrange the Hyprland tray workspace
+After=unified-quickshell.service
+PartOf=unified-session.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=-/usr/bin/hyprctl dispatch "hl.dsp.focus({ workspace = \"3\" })"
+ExecStart=%h/.config/hypr/scripts/hypr-tray-session ensure
+TimeoutStartSec=60
+
+[Install]
+WantedBy=unified-session.target

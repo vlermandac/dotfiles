@@ -1,0 +1,14 @@
+# (AI-assisted) Grok Bot client at login. Secretary bot client.
+# Ordered after the tray layout so its window never lands in the hidden tray. Not PartOf the
+# session: restarting the session must not close a running client.
+[Unit]
+Description=Grok Bot client (session autostart)
+After=unified-session-tray.service unified-quickshell.service
+
+[Service]
+Type=exec
+ExecCondition=/bin/sh -c '! pgrep -x grok-bot >/dev/null'
+ExecStart=%h/.local/share/grok-bot/appimage --
+
+[Install]
+WantedBy=unified-session.target

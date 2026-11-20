@@ -1,0 +1,11 @@
+# (AI-assisted) Let the desktop settle before waking Docker and the media compose stack.
+[Unit]
+Description=Start the media stack shortly after login
+PartOf=unified-session.target
+
+[Timer]
+OnActiveSec=20
+Unit=media-stack.service
+
+[Install]
+WantedBy=unified-session.target

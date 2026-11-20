@@ -38,13 +38,19 @@ for _, entry in ipairs({
     hl.env(entry[1], entry[2])
 end
 
--- Hyprland 0.55+ documents the hyprland.start event as the Lua equivalent of exec-once.
--- Run the bootstrap as a supervised user unit so a boot-time Wayland-socket race is retried and
--- failures are visible in the user journal instead of silently leaving an empty desktop.
-hl.on("hyprland.start", function()
-    hl.exec_cmd("systemctl --user restart unified-session-bootstrap.service")
-end)
-
-hl.on("hyprland.shutdown", function()
-    hl.exec_cmd("systemctl --user stop unified-session-bootstrap.service unified-quickshell.service waywallen.service")
-end)
+-- (AI-assisted) Session startup is owned by unified-quickshell: its module restarts
+-- unified-session.target on hyprland.start and stops it on shutdown. systemd orders the
+-- environment import, Waywallen, the shell and the personal units in desktop-session.
+-- Fallback for a machine where scripts/install-session has not linked the module yet: the
+-- previous bash bootstrap, so a missing install never leaves an empty desktop.
+local session_module = home .. "/.config/unified-quickshell/hyprland.lua"
+local loaded, load_error = pcall(dofile, session_module)
+if not loaded then
+    print("unified session module unavailable (" .. tostring(load_error) .. "); using session-bootstrap")
+    hl.on("hyprland.start", function()
+        hl.exec_cmd("systemctl --user restart unified-session-bootstrap.service")
+    end)
+    hl.on("hyprland.shutdown", function()
+        hl.exec_cmd("systemctl --user stop unified-session-bootstrap.service unified-quickshell.service waywallen.service")
+    end)
+end

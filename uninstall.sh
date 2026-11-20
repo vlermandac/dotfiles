@@ -8,7 +8,7 @@ fi
 
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 target_dir="${HOME}"
-packages=(btop environment gh git herdr hypr kitty mpv npm nvim paru sioyek thunar tree-sitter yazi yt-dlp zsh)
+packages=(btop desktop-session environment gh git herdr hypr kitty mpv npm nvim paru sioyek thunar tree-sitter yazi yt-dlp zsh)
 stow_ignore='^([.]zprofile|[.]zshenv|[.]zshrc|zshrc[.]d)(/|$)|(^|/)(hosts[.]yml|env[.]local[.]zsh)$|[.](bak(-.*)?|before-.*|tmp|orig)$'
 
 stow \
